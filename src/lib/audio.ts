@@ -69,7 +69,7 @@ export const sfx = {
     noise(0.12, 0.08, 500);
   },
   pop: (wave: number, i = 0) => {
-    const f = SCALE[Math.min(SCALE.length - 1, wave - 1)] * (1 + i * 0.03);
+    const f = SCALE[Math.min(SCALE.length - 1, wave - 1)]! * (1 + i * 0.03);
     tone(f, 0.35, "sine", 0.16, i * 0.045);
     tone(f * 2, 0.18, "triangle", 0.05, i * 0.045);
     noise(0.18, 0.05, 2400);
@@ -83,7 +83,7 @@ export const sfx = {
     noise(0.4, 0.1, 300);
   },
   clear: () => {
-    [0, 1, 2, 3, 4, 5].forEach((i) => tone(SCALE[i] * 2, 0.5, "sine", 0.12, i * 0.07));
+    [0, 1, 2, 3, 4, 5].forEach((i) => tone(SCALE[i]! * 2, 0.5, "sine", 0.12, i * 0.07));
   },
   over: () => {
     [440, 350, 260, 180].forEach((f, i) => tone(f, 0.5, "sawtooth", 0.12, i * 0.13));

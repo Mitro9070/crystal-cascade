@@ -28,23 +28,23 @@ export const rollPiece = (): number | null => (Math.random() < 0.15 ? null : ran
 
 export function toGrid(balls: Ball[]): (Ball | null)[][] {
   const g: (Ball | null)[][] = Array.from({ length: SIZE }, () => Array(SIZE).fill(null));
-  for (const b of balls) if (b.row >= 0 && b.row < SIZE) g[b.row][b.col] = b;
+  for (const b of balls) if (b.row >= 0 && b.row < SIZE) g[b.row]![b.col] = b;
   return g;
 }
 
 export function landingRow(balls: Ball[], col: number): number {
   const g = toGrid(balls);
-  for (let r = SIZE - 1; r >= 0; r--) if (!g[r][col]) return r;
+  for (let r = SIZE - 1; r >= 0; r--) if (!g[r]![col]) return r;
   return -1;
 }
 
 export function runLengths(g: (Ball | null)[][], col: number, row: number) {
   let v = 1;
-  for (let r = row - 1; r >= 0 && g[r][col]; r--) v++;
-  for (let r = row + 1; r < SIZE && g[r][col]; r++) v++;
+  for (let r = row - 1; r >= 0 && g[r]![col]; r--) v++;
+  for (let r = row + 1; r < SIZE && g[r]![col]; r++) v++;
   let h = 1;
-  for (let c = col - 1; c >= 0 && g[row][c]; c--) h++;
-  for (let c = col + 1; c < SIZE && g[row][c]; c++) h++;
+  for (let c = col - 1; c >= 0 && g[row]![c]; c--) h++;
+  for (let c = col + 1; c < SIZE && g[row]![c]; c++) h++;
   return { v, h };
 }
 
@@ -71,11 +71,11 @@ export function damagedNeighbours(balls: Ball[], exploding: Ball[]): Ball[] {
       [-1, 0],
       [0, 1],
       [0, -1],
-    ]) {
+    ] as const) {
       const c = b.col + dc;
       const r = b.row + dr;
       if (c < 0 || c >= SIZE || r < 0 || r >= SIZE) continue;
-      const n = g[r][c];
+      const n = g[r]![c];
       if (n && n.num == null && !hit.has(n.id)) {
         hit.add(n.id);
         res.push(n);
