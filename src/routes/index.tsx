@@ -56,9 +56,10 @@ function startBalls(): Ball[] {
 }
 
 function Game() {
-  const [balls, setBalls] = useState<Ball[]>(() => startBalls());
-  const [current, setCurrent] = useState<number | null>(() => rollPiece());
-  const [next, setNext] = useState<number | null>(() => rollPiece());
+  const [balls, setBalls] = useState<Ball[]>([]);
+  const [current, setCurrent] = useState<number | null>(null);
+  const [next, setNext] = useState<number | null>(null);
+
   const [aim, setAim] = useState(3);
   const [score, setScore] = useState(0);
   const [best, setBest] = useState(0);
