@@ -76,9 +76,13 @@ function Game() {
   const boardRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
+    setBalls(startBalls());
+    setCurrent(rollPiece());
+    setNext(rollPiece());
     const b = Number(localStorage.getItem("neon7-best") ?? 0);
     if (b) setBest(b);
   }, []);
+
   useEffect(() => {
     if (score > best) {
       setBest(score);
