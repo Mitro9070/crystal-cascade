@@ -142,3 +142,179 @@
     color: var(--color-foreground);
   }
 }
+
+/* ===== Cyber-Glass / Neon Neumorphism game theme ===== */
+:root {
+  --bg-deep: oklch(0.16 0.055 275);
+  --bg-deep-2: oklch(0.11 0.04 285);
+  --glass: oklch(0.32 0.05 275 / 28%);
+  --glass-border: oklch(0.85 0.06 280 / 18%);
+  --neon: oklch(0.78 0.17 200);
+  --ink: oklch(0.97 0.01 280);
+  --ink-dim: oklch(0.78 0.03 280 / 75%);
+
+  --n1: oklch(0.96 0.015 250);
+  --n2: oklch(0.82 0.15 205);
+  --n3: oklch(0.79 0.17 155);
+  --n4: oklch(0.86 0.15 90);
+  --n5: oklch(0.75 0.17 45);
+  --n6: oklch(0.7 0.22 355);
+  --n7: oklch(0.62 0.24 295);
+  --obsidian: oklch(0.2 0.02 280);
+  --lava: oklch(0.8 0.16 75);
+}
+
+@theme inline {
+  --color-ink: var(--ink);
+  --color-ink-dim: var(--ink-dim);
+  --color-neon: var(--neon);
+}
+
+.game-root {
+  background:
+    radial-gradient(120% 80% at 50% -10%, oklch(0.38 0.13 290 / 55%), transparent 60%),
+    radial-gradient(90% 60% at 10% 110%, oklch(0.4 0.14 200 / 35%), transparent 60%),
+    linear-gradient(180deg, var(--bg-deep), var(--bg-deep-2));
+  color: var(--ink);
+  font-family: ui-rounded, "SF Pro Rounded", "Segoe UI", system-ui, sans-serif;
+}
+
+.glass {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(18px) saturate(150%);
+  box-shadow:
+    0 12px 40px oklch(0 0 0 / 45%),
+    inset 0 1px 0 oklch(1 0 0 / 12%);
+}
+
+.ball {
+  position: absolute;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  transition:
+    top 190ms cubic-bezier(0.34, 1.4, 0.64, 1),
+    left 140ms ease,
+    transform 180ms ease,
+    opacity 180ms ease;
+  will-change: top, transform;
+}
+.ball-face {
+  position: absolute;
+  inset: 6%;
+  border-radius: 999px;
+  background:
+    radial-gradient(38% 32% at 32% 26%, oklch(1 0 0 / 78%), transparent 62%),
+    radial-gradient(80% 80% at 70% 78%, var(--c-dark), transparent 70%),
+    linear-gradient(160deg, color-mix(in oklab, var(--c) 92%, white 8%), color-mix(in oklab, var(--c) 55%, black));
+  box-shadow:
+    0 0 18px color-mix(in oklab, var(--c) 60%, transparent),
+    0 0 42px color-mix(in oklab, var(--c) 35%, transparent),
+    inset 0 -6px 14px oklch(0 0 0 / 35%),
+    inset 0 4px 10px oklch(1 0 0 / 22%);
+}
+.ball-num {
+  position: relative;
+  z-index: 2;
+  font-size: clamp(0.9rem, 4.2vw, 1.5rem);
+  color: oklch(0.14 0.03 280);
+  text-shadow: 0 1px 0 oklch(1 0 0 / 45%);
+}
+.ball-obsidian .ball-face {
+  background:
+    radial-gradient(35% 30% at 30% 24%, oklch(1 0 0 / 28%), transparent 60%),
+    linear-gradient(160deg, oklch(0.28 0.03 285), oklch(0.08 0.01 280));
+  box-shadow:
+    inset 0 -6px 14px oklch(0 0 0 / 60%),
+    inset 0 3px 8px oklch(1 0 0 / 12%),
+    0 6px 18px oklch(0 0 0 / 50%);
+}
+.ball-cracked .ball-face::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background:
+    conic-gradient(from 20deg, transparent 0 12%, var(--lava) 12.4% 13.4%, transparent 14% 40%,
+      var(--lava) 40.4% 41.2%, transparent 42% 68%, var(--lava) 68.4% 69.4%, transparent 70%);
+  mix-blend-mode: screen;
+  filter: drop-shadow(0 0 6px var(--lava));
+  opacity: 0.95;
+}
+
+.pop {
+  animation: pop-out 300ms ease-out forwards;
+}
+@keyframes pop-out {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.28); filter: brightness(2.2); }
+  100% { transform: scale(0.1); opacity: 0; filter: brightness(3); }
+}
+.squash {
+  animation: squash 260ms cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+@keyframes squash {
+  0% { transform: scaleY(0.62) scaleX(1.25); }
+  55% { transform: scaleY(1.12) scaleX(0.9); }
+  100% { transform: scale(1); }
+}
+.shake-1 { animation: shake 260ms ease-in-out; }
+.shake-2 { animation: shake 340ms ease-in-out; --amp: 8px; }
+.shake-3 { animation: shake 420ms ease-in-out; --amp: 14px; }
+@keyframes shake {
+  0%, 100% { transform: translate(0, 0) rotate(0); }
+  20% { transform: translate(calc(var(--amp, 4px) * -1), 2px) rotate(-0.5deg); }
+  45% { transform: translate(var(--amp, 4px), -2px) rotate(0.5deg); }
+  70% { transform: translate(calc(var(--amp, 4px) * -0.6), 1px); }
+}
+.ring {
+  position: absolute;
+  border-radius: 999px;
+  border: 2px solid oklch(1 0 0 / 85%);
+  animation: ring 520ms ease-out forwards;
+  pointer-events: none;
+}
+@keyframes ring {
+  0% { transform: scale(0.2); opacity: 1; }
+  100% { transform: scale(2.6); opacity: 0; }
+}
+.spark {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  pointer-events: none;
+  animation: spark 700ms cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
+}
+@keyframes spark {
+  0% { transform: translate(0, 0) scale(1); opacity: 1; }
+  100% { transform: translate(var(--dx), var(--dy)) scale(0.2); opacity: 0; }
+}
+.float-score {
+  position: absolute;
+  font-weight: 900;
+  pointer-events: none;
+  animation: floaty 900ms ease-out forwards;
+  text-shadow: 0 0 14px currentColor;
+}
+@keyframes floaty {
+  0% { transform: translate(-50%, 0) scale(0.7); opacity: 0; }
+  25% { transform: translate(-50%, -12px) scale(1.15); opacity: 1; }
+  100% { transform: translate(-50%, -58px) scale(1); opacity: 0; }
+}
+.banner {
+  animation: banner 1.5s ease-out forwards;
+}
+@keyframes banner {
+  0% { transform: scale(0.6); opacity: 0; }
+  18% { transform: scale(1.06); opacity: 1; }
+  75% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(1.1); opacity: 0; }
+}
+.pulse-slow { animation: pulse-slow 2.6s ease-in-out infinite; }
+@keyframes pulse-slow {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
