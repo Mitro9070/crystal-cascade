@@ -56,9 +56,10 @@ function startBalls(): Ball[] {
 }
 
 function Game() {
-  const [balls, setBalls] = useState<Ball[]>(() => startBalls());
-  const [current, setCurrent] = useState<number | null>(() => rollPiece());
-  const [next, setNext] = useState<number | null>(() => rollPiece());
+  const [balls, setBalls] = useState<Ball[]>([]);
+  const [current, setCurrent] = useState<number | null>(null);
+  const [next, setNext] = useState<number | null>(null);
+
   const [aim, setAim] = useState(3);
   const [score, setScore] = useState(0);
   const [best, setBest] = useState(0);
@@ -75,9 +76,13 @@ function Game() {
   const boardRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
+    setBalls(startBalls());
+    setCurrent(rollPiece());
+    setNext(rollPiece());
     const b = Number(localStorage.getItem("neon7-best") ?? 0);
     if (b) setBest(b);
   }, []);
+
   useEffect(() => {
     if (score > best) {
       setBest(score);
