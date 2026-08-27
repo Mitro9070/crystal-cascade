@@ -13,6 +13,7 @@ namespace Neon7
     public class BoardView : MonoBehaviour
     {
         [SerializeField] private RectTransform boardRoot;   // квадрат, clip children
+        [SerializeField] private RectTransform gridLayer;   // слой сетки (под шарами)
         [SerializeField] private RectTransform ballsLayer;
         [SerializeField] private RectTransform fxLayer;
         [SerializeField] private Image gridPrefab;          // UI/grid_cell.png
@@ -25,32 +26,45 @@ namespace Neon7
 
         private readonly Dictionary<int, BallView> _views = new Dictionary<int, BallView>();
         private Vector2 _boardHome;
+        private bool _homeCaptured;
         private Coroutine _shake;
 
         public float BoardWidth => boardRoot.rect.width;
         public float Cell => Metrics.Cell(BoardWidth);
         public float FontSize => Metrics.NumberFontSize(BoardWidth);
 
-        private void Awake()
+        private void Start()
         {
-            _boardHome = boardRoot.anchoredPosition;
+            // Start, а не Awake: к этому моменту Layout Group уже посчитал размер поля,
+            // иначе Cell берётся из незаполненного rect и сетка «разъезжается».
+            CaptureHome();
             BuildGrid();
+        }
+
+        private void CaptureHome()
+        {
+            if (_homeCaptured) return;
+            _boardHome = boardRoot.anchoredPosition;
+            _homeCaptured = true;
         }
 
         private void BuildGrid()
         {
             if (!gridPrefab) return;
+            var parent = gridLayer ? gridLayer : ballsLayer;
             for (int r = 0; r < GameLogic.Size; r++)
                 for (int c = 0; c < GameLogic.Size; c++)
                 {
-                    var cellImg = Instantiate(gridPrefab, ballsLayer.parent);
+                    var cellImg = Instantiate(gridPrefab, parent);
                     var rt = (RectTransform)cellImg.transform;
                     rt.SetAsFirstSibling();
                     rt.anchorMin = rt.anchorMax = new Vector2(0f, 1f);
                     rt.pivot = new Vector2(0f, 1f);
+                    rt.localScale = Vector3.one;
                     rt.sizeDelta = new Vector2(Cell, Cell);
                     rt.anchoredPosition = new Vector2(c * Cell, -r * Cell);
-                    cellImg.color = Palette.GridLine;
+                    cellImg.color = Palette.GridLine;   // 1px белый 5% — как border-white/5 в вебе
+                    cellImg.raycastTarget = false;
                 }
         }
 
