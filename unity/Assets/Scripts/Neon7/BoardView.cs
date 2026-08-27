@@ -274,6 +274,7 @@ namespace Neon7
         /// <summary>Screen shake уровня 1..3 (см. README §5).</summary>
         public void Shake(int level)
         {
+            CaptureHome();
             level = Mathf.Clamp(level, 1, 3);
             if (_shake != null) StopCoroutine(_shake);
             _shake = StartCoroutine(ShakeRoutine(Metrics.ShakeDuration[level - 1], Metrics.ShakeAmplitude[level - 1]));
