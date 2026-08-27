@@ -56,8 +56,11 @@ namespace Neon7
             bool hidden = Data.Num == null;
             Color c = Palette.ForNumber(Data.Num);
 
+            // ВАЖНО: спрайты в Assets/Textures/Balls уже окрашены (градиент + блик + тень),
+            // поэтому tint = белый. Второй раз цвет не накладываем, иначе шар «пересвечен»
+            // и не совпадает с веб-версией.
             face.sprite = hidden ? obsidianSprite : numberSprites[Data.Num.Value - 1];
-            face.color = hidden ? Color.white : c;
+            face.color = Color.white;
 
             if (glow)
             {
@@ -69,9 +72,10 @@ namespace Neon7
 
             if (cracks)
             {
+                // трещины — отдельный слой ball_obsidian_cracked (лава уже в текстуре, blend Screen)
                 cracks.enabled = hidden && Data.Cracks > 0;
                 cracks.sprite = obsidianCrackedSprite;
-                cracks.color = new Color(Palette.Lava.r, Palette.Lava.g, Palette.Lava.b, 0.95f);
+                cracks.color = new Color(1f, 1f, 1f, 0.95f);
             }
         }
 
