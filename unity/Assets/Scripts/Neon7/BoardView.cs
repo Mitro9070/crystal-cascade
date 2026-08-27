@@ -45,6 +45,8 @@ namespace Neon7
         {
             if (_ready) return;
             Canvas.ForceUpdateCanvases();
+            var layoutParent = boardRoot.parent as RectTransform;
+            if (layoutParent) LayoutRebuilder.ForceRebuildLayoutImmediate(layoutParent);
             LayoutRebuilder.ForceRebuildLayoutImmediate(boardRoot);
             PrepareGeometry();
             CaptureHome();

@@ -62,10 +62,12 @@
 (44+12+62+12+56+12+22+8+396+12+16 = 652 при контенте 900−16−20 = 864, остаток — свободный отступ снизу).
 
 Правила, чтобы текст не обрезался и не наезжал (как на скриншотах Unity-сборки):
-- Все `TMP_Text`: `Overflow = Overflow`, **Auto Size выключен**, `Wrapping = Disabled` для
-  однострочных лейблов (заголовок, `NEXT`, лейблы счёта) и `Enabled` только для подсказки/баннера.
+- Однострочные `TMP_Text`: `Overflow = Truncate`, **Auto Size выключен**, `Wrapping = Disabled`.
+  Текст не сможет рисоваться поверх соседней колонки. Для подсказки/баннера wrapping можно включить.
 - Header: заголовок в `Horizontal Layout Group` с `flexibleWidth = 1`, кнопки — `minWidth 44`,
   `LayoutElement.flexibleWidth = 0`. Никаких `Content Size Fitter` на заголовке.
+- Три колонки scoreboard: одинаковый `LayoutElement.flexibleWidth = 1`, `minWidth = 0`,
+  внутренние label/value растянуты по ширине своей колонки. Не ставить `ContentSizeFitter`.
 - Подсказка внизу — **один** объект текста в самом низу колонки; не размещать её поверх поля.
 - Кириллица и знаки `↻ 🔊 ∞ ×` должны быть в TMP-атласе шрифта; иначе вместо них появятся
   пустые прямоугольники, а строки визуально «съедаются». Для иконок mute/restart лучше
@@ -147,7 +149,7 @@ BoardRoot (396×396, pivot 0.5/0.5, RectMask2D)
   задавать `AspectRatioFitter (1:1)` или `LayoutElement.preferredHeight = width`.
 - Не назначать `ballsLayer = BoardRoot`: shake двигает `BoardRoot`, а локальные координаты шаров
   должны вычисляться внутри отдельного слоя с нулевыми offsets.
-- Код `BoardView.EnsureReady()` принудительно завершает Layout до вычисления `cell`, растягивает
+- Код `BoardView.EnsureReady()` сначала перестраивает родительский Layout, затем поле, растягивает
   все три слоя одинаково и только потом строит сетку/создаёт шары.
 - У всех объектов `Ball` root: anchor/pivot top-left, размер `cell×cell`, позиция
   `(col×cell, -row×cell)`. Внутренние `face`, `glow`, `cracks`, `num` центрируются кодом;

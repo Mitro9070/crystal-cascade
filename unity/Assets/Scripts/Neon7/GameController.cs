@@ -69,7 +69,7 @@ namespace Neon7
             if (!text) return;
             text.enableAutoSizing = false;
             text.enableWordWrapping = false;
-            text.overflowMode = TextOverflowModes.Overflow;
+            text.overflowMode = TextOverflowModes.Truncate;
             text.maxVisibleLines = 1;
             text.raycastTarget = false;
         }
