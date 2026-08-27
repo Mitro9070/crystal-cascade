@@ -369,7 +369,7 @@ function Game() {
               background: preview.match ? "oklch(0.79 0.17 155 / 18%)" : "transparent",
             }}
           >
-            ↕ {preview.v} · ↔ {preview.h} {preview.match ? "· ВЗРЫВ!" : ""}
+            верт. {preview.v} · гор. {preview.h} {preview.match ? "· ВЗРЫВ!" : ""}
           </span>
         </div>
 

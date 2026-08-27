@@ -53,9 +53,23 @@
 | Header (заголовок + 2 кнопки 44×44) | 44 | 0 | 16 (кнопки) | gap между кнопками 8 |
 | Scoreboard (3 колонки: Счёт / Рекорд / До подъёма) | 62 | 12 | 24 | padding 16/12, glass |
 | Ряд Next + переключатель режимов | 56 | 12 | 24 | glass, слева шар 48 + next-шар 32, gap 12 |
-| Aim-строка `↕ v · ↔ h` | 22 | 12 | 999 | по центру, 11px bold |
+| Aim-строка `верт. v · гор. h` | 22 | 12 | 999 | по центру, 11px bold |
 | Board (квадрат) | = ширина (396) | 8 | 32 | glass, `overflow: hidden` |
 | Подсказка внизу | 16 | 12 | — | 11px, `ink-dim`, пульсация §6.7 |
+
+**В прототипе больше ничего нет.** Ряда бустеров (`BOMB / RAIN / SWAP`), второй строки подсказки
+и любых иных панелей в вебе не существует — не добавлять, иначе колонка не сходится по высоте
+(44+12+62+12+56+12+22+8+396+12+16 = 652 при контенте 900−16−20 = 864, остаток — свободный отступ снизу).
+
+Правила, чтобы текст не обрезался и не наезжал (как на скриншотах Unity-сборки):
+- Все `TMP_Text`: `Overflow = Overflow`, **Auto Size выключен**, `Wrapping = Disabled` для
+  однострочных лейблов (заголовок, `NEXT`, лейблы счёта) и `Enabled` только для подсказки/баннера.
+- Header: заголовок в `Horizontal Layout Group` с `flexibleWidth = 1`, кнопки — `minWidth 44`,
+  `LayoutElement.flexibleWidth = 0`. Никаких `Content Size Fitter` на заголовке.
+- Подсказка внизу — **один** объект текста в самом низу колонки; не размещать её поверх поля.
+- Кириллица и знаки `↻ 🔊 ∞ ×` должны быть в TMP-атласе шрифта; иначе вместо них появятся
+  пустые прямоугольники, а строки визуально «съедаются». Для иконок mute/restart лучше
+  использовать спрайты, а не глифы шрифта.
 
 Типографика:
 - `NEON SEVEN` — 20px, weight 900, tracking −0.02em; слово `SEVEN` цветом `n2` `#00DFF2`.
@@ -74,6 +88,29 @@
 В Unity: `Assets/Textures/UI/panel_glass.png` как 9-slice `Image` (border 40px) +
 для реального blur — URP Renderer Feature «Blit» с downsample/blur в `_GrabTexture`,
 либо готовый шейдер `UI/Blur` (Kawase, 2 прохода, radius 18px в экранных пикселях).
+
+### 2.1 Как использовать готовые тайлы (обязательно)
+
+| Тайл | Где | Настройки |
+| --- | --- | --- |
+| `Backgrounds/bg_deep_indigo.jpg` | `RawImage` на весь экран, самый нижний слой | Sprite/Default, stretch, tint белый |
+| `UI/panel_glass.png` | все glass-панели (scoreboard, next, board, Game Over, баннер) | Sprite 2D/UI, 9-slice border 40, tint **белый**, `Image.Type = Sliced`, `Pixels Per Unit Multiplier` не менять |
+| `UI/grid_cell.png` | клетка сетки поля, 49 шт. | 9-slice border 8, tint `#FFFFFF` alpha `0.05`, `raycastTarget = false` |
+| `Balls/ball_<N>_<name>.png` | `face` в `BallPrefab` | **tint белый** — градиент, блик и тень уже в текстуре |
+| `Balls/ball_obsidian.png` | скрытый шар | tint белый, glow выключен |
+| `Balls/ball_obsidian_cracked.png` | слой `cracks` поверх обсидиана | tint белый, blend Screen/Additive, alpha 0.95 |
+| `VFX/vfx_shockwave_ring.png` | кольцо взрыва | материал Additive, tint = цвет цифры |
+| `VFX/vfx_spark_glow.png` | искры 6×6 | материал Additive, tint = цвет цифры |
+
+Главное расхождение, которое чаще всего ломает картинку: спрайты шаров **уже окрашены**.
+Если дополнительно умножить их на цвет из `Palette.Numbers`, шар становится пересвеченным
+и не совпадает с вебом. Цвет из палитры применяется только к `glow`, VFX и тексту счёта
+(см. `BallView.Refresh`).
+
+Радиусы панелей заданы текстурой `panel_glass.png` (32px при 512). Для панелей с радиусом 24
+уменьшать 9-slice border до 30, для кнопок 44×44 с радиусом 16 — до 20; не масштабировать
+панель непропорционально, иначе углы «плывут» относительно веб-версии.
+
 
 ---
 
