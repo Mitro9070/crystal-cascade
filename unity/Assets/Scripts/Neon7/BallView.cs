@@ -135,11 +135,15 @@ namespace Neon7
             _faceRt.localScale = Vector3.one;
         }
 
-        /// <summary>pop 300ms: scale 1 -> 1.28 (brightness 2.2) -> 0.1, opacity -> 0.</summary>
+        /// <summary>
+        /// pop 300ms: scale 1 -> 1.28 (brightness 2.2) -> 0.1, opacity -> 0.
+        /// Спрайт уже окрашен, поэтому «brightness» имитируем засветкой в белый (Lerp к белому)
+        /// и усилением glow — визуально это то же, что filter: brightness() в CSS.
+        /// </summary>
         public IEnumerator PlayPop()
         {
             float dur = Metrics.Pop;
-            Color baseColor = face.color;
+            Color glowBase = glow ? glow.color : Color.clear;
             for (float t = 0f; t < dur; t += Time.deltaTime)
             {
                 float p = Easing.EaseOut(t / dur);
@@ -158,13 +162,17 @@ namespace Neon7
                     bright = Mathf.Lerp(2.2f, 3f, k);
                     alpha = 1f - k;
                 }
+                float white = Mathf.InverseLerp(1f, 3f, bright);   // 0..1
                 _faceRt.localScale = Vector3.one * scale;
-                face.color = new Color(
-                    Mathf.Min(1f, baseColor.r * bright),
-                    Mathf.Min(1f, baseColor.g * bright),
-                    Mathf.Min(1f, baseColor.b * bright), alpha);
-                if (numText) numText.alpha = alpha;
-                if (glow) glow.color = new Color(glow.color.r, glow.color.g, glow.color.b, 0.6f * alpha);
+                face.color = new Color(1f, 1f, 1f, alpha);
+                if (numText) numText.alpha = alpha * (1f - white);
+                if (glow)
+                {
+                    Color g = Color.Lerp(new Color(glowBase.r, glowBase.g, glowBase.b), Color.white, white);
+                    glow.enabled = true;
+                    glow.color = new Color(g.r, g.g, g.b, Mathf.Clamp01(0.6f + 0.4f * white) * alpha);
+                    ((RectTransform)glow.transform).localScale = Vector3.one * Mathf.Lerp(1f, 1.35f, white);
+                }
                 yield return null;
             }
         }
