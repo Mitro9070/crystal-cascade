@@ -28,17 +28,65 @@ namespace Neon7
         private Vector2 _boardHome;
         private bool _homeCaptured;
         private Coroutine _shake;
+        private Coroutine _aimMove;
+        private Coroutine _ghostMove;
+        private bool _ready;
 
         public float BoardWidth => boardRoot.rect.width;
         public float Cell => Metrics.Cell(BoardWidth);
         public float FontSize => Metrics.NumberFontSize(BoardWidth);
 
-        private void Start()
+        private void Awake()
         {
-            // Start, а не Awake: к этому моменту Layout Group уже посчитал размер поля,
-            // иначе Cell берётся из незаполненного rect и сетка «разъезжается».
+            PrepareGeometry();
+        }
+
+        public void EnsureReady()
+        {
+            if (_ready) return;
+            Canvas.ForceUpdateCanvases();
+            var layoutParent = boardRoot.parent as RectTransform;
+            if (layoutParent) LayoutRebuilder.ForceRebuildLayoutImmediate(layoutParent);
+            LayoutRebuilder.ForceRebuildLayoutImmediate(boardRoot);
+            PrepareGeometry();
             CaptureHome();
             BuildGrid();
+            _ready = true;
+        }
+
+        private void Start()
+        {
+            EnsureReady();
+        }
+
+        private void PrepareGeometry()
+        {
+            StretchToBoard(gridLayer);
+            StretchToBoard(ballsLayer);
+            StretchToBoard(fxLayer);
+            PrepareTopLeft(aimColumn ? (RectTransform)aimColumn.transform : null);
+            PrepareTopLeft(landingGhost ? (RectTransform)landingGhost.transform : null);
+        }
+
+        private static void StretchToBoard(RectTransform layer)
+        {
+            if (!layer) return;
+            layer.anchorMin = Vector2.zero;
+            layer.anchorMax = Vector2.one;
+            layer.pivot = new Vector2(0.5f, 0.5f);
+            layer.offsetMin = Vector2.zero;
+            layer.offsetMax = Vector2.zero;
+            layer.localScale = Vector3.one;
+            layer.localRotation = Quaternion.identity;
+        }
+
+        private static void PrepareTopLeft(RectTransform rt)
+        {
+            if (!rt) return;
+            rt.anchorMin = rt.anchorMax = new Vector2(0f, 1f);
+            rt.pivot = new Vector2(0f, 1f);
+            rt.localScale = Vector3.one;
+            rt.localRotation = Quaternion.identity;
         }
 
         private void CaptureHome()
@@ -72,6 +120,7 @@ namespace Neon7
 
         public BallView Spawn(BallData data)
         {
+            EnsureReady();
             var v = Instantiate(ballPrefab, ballsLayer);
             var rt = (RectTransform)v.transform;
             rt.anchorMin = rt.anchorMax = new Vector2(0f, 1f);
@@ -85,6 +134,7 @@ namespace Neon7
 
         public void Sync(List<BallData> balls)
         {
+            EnsureReady();
             var alive = new HashSet<int>();
             foreach (var b in balls)
             {
@@ -118,7 +168,8 @@ namespace Neon7
             {
                 var rt = (RectTransform)aimColumn.transform;
                 rt.sizeDelta = new Vector2(Cell, BoardWidth);
-                StartCoroutine(TweenX(rt, col * Cell, Metrics.AimTween));
+                if (_aimMove != null) StopCoroutine(_aimMove);
+                _aimMove = StartCoroutine(TweenX(rt, col * Cell, Metrics.AimTween));
                 aimColumn.color = match ? Palette.AimMatch : Palette.AimNormal;
             }
             if (landingGhost)
@@ -128,7 +179,8 @@ namespace Neon7
                 {
                     var rt = (RectTransform)landingGhost.transform;
                     rt.sizeDelta = new Vector2(Cell, Cell);
-                    StartCoroutine(TweenPos(rt, new Vector2(col * Cell, -landingRow * Cell), Metrics.AimTween));
+                    if (_ghostMove != null) StopCoroutine(_ghostMove);
+                    _ghostMove = StartCoroutine(TweenPos(rt, new Vector2(col * Cell, -landingRow * Cell), Metrics.AimTween));
                     landingGhost.color = Palette.GhostBorder;
                 }
             }
@@ -144,6 +196,7 @@ namespace Neon7
                 yield return null;
             }
             rt.anchoredPosition = to;
+            _aimMove = null;
         }
 
         private IEnumerator TweenPos(RectTransform rt, Vector2 to, float dur)
@@ -155,6 +208,7 @@ namespace Neon7
                 yield return null;
             }
             rt.anchoredPosition = to;
+            _ghostMove = null;
         }
 
         /// <summary>col = floor((x - left) / width * 7), clamp 0..6.</summary>
