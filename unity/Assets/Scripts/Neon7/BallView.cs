@@ -25,6 +25,9 @@ namespace Neon7
 
         private RectTransform _rt;
         private RectTransform _faceRt;
+        private RectTransform _glowRt;
+        private RectTransform _cracksRt;
+        private RectTransform _numRt;
         private float _cell;
         private Coroutine _move;
 
@@ -32,23 +35,53 @@ namespace Neon7
         {
             _rt = (RectTransform)transform;
             _faceRt = (RectTransform)face.transform;
+            _glowRt = glow ? (RectTransform)glow.transform : null;
+            _cracksRt = cracks ? (RectTransform)cracks.transform : null;
+            _numRt = numText ? (RectTransform)numText.transform : null;
         }
 
         public void Init(BallData data, float cell, float fontSize)
         {
             Data = data;
             _cell = cell;
+            _rt.anchorMin = _rt.anchorMax = new Vector2(0f, 1f);
+            _rt.pivot = new Vector2(0f, 1f);
+            _rt.localScale = Vector3.one;
+            _rt.localRotation = Quaternion.identity;
             _rt.sizeDelta = new Vector2(cell, cell);
 
             float d = Metrics.BallDiameter(cell);
-            _faceRt.sizeDelta = new Vector2(d, d);
-            if (glow) ((RectTransform)glow.transform).sizeDelta =
-                new Vector2(d + Metrics.BallGlowOuter, d + Metrics.BallGlowOuter);
-
-            numText.fontSize = fontSize;
-            numText.color = Palette.NumInk;
+            PlaceAtCellCenter(_faceRt, d);
+            if (_glowRt) PlaceAtCellCenter(_glowRt, d + Metrics.BallGlowOuter);
+            if (_cracksRt) PlaceAtCellCenter(_cracksRt, d);
+            if (_numRt)
+            {
+                PlaceAtCellCenter(_numRt, d);
+                numText.enableAutoSizing = false;
+                numText.enableWordWrapping = false;
+                numText.overflowMode = TextOverflowModes.Overflow;
+                numText.alignment = TextAlignmentOptions.Center;
+                numText.margin = Vector4.zero;
+                numText.raycastTarget = false;
+                numText.fontSize = fontSize;
+                numText.color = Palette.NumInk;
+            }
+            face.preserveAspect = true;
+            face.raycastTarget = false;
+            if (glow) glow.raycastTarget = false;
+            if (cracks) cracks.raycastTarget = false;
             Refresh();
             SetCell(data.Col, data.Row, instant: true);
+        }
+
+        private static void PlaceAtCellCenter(RectTransform rt, float size)
+        {
+            rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
+            rt.pivot = new Vector2(0.5f, 0.5f);
+            rt.anchoredPosition = Vector2.zero;
+            rt.sizeDelta = new Vector2(size, size);
+            rt.localScale = Vector3.one;
+            rt.localRotation = Quaternion.identity;
         }
 
         public void Refresh()

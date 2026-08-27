@@ -127,6 +127,32 @@
   - переезд к новой колонке — 150 мс linear.
 - «Призрак» посадки: круг `cell × cell`, обводка 2px dashed белая alpha `0.30`, тот же переход 150 мс.
 
+### 3.1 Обязательная иерархия RectTransform
+
+Проблема «шары живут отдельно от клеток» возникает, если `ballsLayer`, `gridLayer` и `fxLayer`
+имеют разные anchors, offsets или масштаб. Использовать только такую структуру:
+
+```text
+BoardRoot (396×396, pivot 0.5/0.5, RectMask2D)
+├── GridLayer   (stretch/stretch, offsets 0, scale 1)
+├── AimColumn   (anchor/pivot top-left)
+├── LandingGhost (anchor/pivot top-left)
+├── BallsLayer  (stretch/stretch, offsets 0, scale 1)
+└── FxLayer     (stretch/stretch, offsets 0, scale 1)
+```
+
+- На `GridLayer`, `BallsLayer`, `FxLayer` **не должно быть** `GridLayoutGroup`,
+  `Horizontal/VerticalLayoutGroup`, `ContentSizeFitter` или ненулевого padding.
+- `BoardRoot` может находиться во внешнем `VerticalLayoutGroup`, но его квадратный размер должен
+  задавать `AspectRatioFitter (1:1)` или `LayoutElement.preferredHeight = width`.
+- Не назначать `ballsLayer = BoardRoot`: shake двигает `BoardRoot`, а локальные координаты шаров
+  должны вычисляться внутри отдельного слоя с нулевыми offsets.
+- Код `BoardView.EnsureReady()` принудительно завершает Layout до вычисления `cell`, растягивает
+  все три слоя одинаково и только потом строит сетку/создаёт шары.
+- У всех объектов `Ball` root: anchor/pivot top-left, размер `cell×cell`, позиция
+  `(col×cell, -row×cell)`. Внутренние `face`, `glow`, `cracks`, `num` центрируются кодом;
+  не задавать им Layout-компоненты.
+
 ---
 
 ## 4. Шар (`ball` / `ball-face` / `ball-num`)
@@ -161,6 +187,22 @@
 
 Готовые спрайты: `Assets/Textures/Balls/ball_<N>_<name>.png` 512×512 с альфой;
 цифра рисуется поверх TextMeshPro.
+
+Точная иерархия `BallPrefab`:
+
+```text
+Ball (RectTransform; без Image и без Layout Group)
+├── Glow   (Image, Raycast Target off)
+├── Face   (Image, Preserve Aspect on, Raycast Target off)
+├── Cracks (Image, Raycast Target off)
+└── Num    (TextMeshProUGUI, alignment Middle Center)
+```
+
+Слои должны идти именно в таком порядке: цифра последней, иначе `Face` или `Cracks` перекроют её.
+У `Num`: margins `0`, Auto Size off, Wrapping off, Overflow, один символ, scale `1,1,1`.
+Не помещать `Num` внутрь `Face`, если на `Face` есть Animator/scale: squash применяется к сфере,
+а координаты текста должны оставаться строго в центре ячейки. `BallView.Init()` теперь сам
+выставляет anchors/pivot/position/size для всех четырёх слоёв.
 
 ---
 
@@ -240,8 +282,8 @@ Haptics: move 6 мс, drop 14/16 мс, комбо `[18,30,24]`, подъём `[1
 3. Повесить `GameController` на пустой объект, заполнить ссылки:
    `boardRoot`, `ballPrefab`, `fxRingPrefab`, `fxSparkPrefab`, `floatTextPrefab`, тексты счёта,
    кнопки mute/restart, панель Game Over, баннер.
-4. `BallPrefab`: RectTransform 1×1 (размер задаёт код) → `Image` (спрайт шара, Raycast off) →
-   дочерний `TMP_Text` (цифра) → дочерний `Image` (трещины, disabled).
+4. `BallPrefab` собрать строго по иерархии §4. Все четыре визуальных слоя — прямые дети `Ball`;
+   `Glow`, `Face`, `Cracks`, `Num`, именно в таком sibling-порядке.
 5. `Sfx` — на том же объекте, `AudioSource` с `playOnAwake = false`.
 6. Проверка «пиксель в пиксель»: скриншот WebGL-прототипа при 420×900 и Unity Player 420×900,
    наложить в режиме Difference — расхождения по сетке/шарам не более 1 px.

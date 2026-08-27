@@ -48,8 +48,30 @@ namespace Neon7
 
         private void Start()
         {
+            board.EnsureReady();
+            ConfigureHudText();
             _best = PlayerPrefs.GetInt(BestKey, 0);
             Restart();
+        }
+
+        private void ConfigureHudText()
+        {
+            ConfigureSingleLine(scoreText);
+            ConfigureSingleLine(bestText);
+            ConfigureSingleLine(movesText);
+            ConfigureSingleLine(movesLabel);
+            ConfigureSingleLine(aimText);
+            ConfigureSingleLine(muteButtonLabel);
+        }
+
+        private static void ConfigureSingleLine(TMP_Text text)
+        {
+            if (!text) return;
+            text.enableAutoSizing = false;
+            text.enableWordWrapping = false;
+            text.overflowMode = TextOverflowModes.Overflow;
+            text.maxVisibleLines = 1;
+            text.raycastTarget = false;
         }
 
         public void Restart()
@@ -267,7 +289,7 @@ namespace Neon7
             }
             if (aimText)
             {
-                aimText.text = $"↕ {v} · ↔ {h}{(match ? " · ВЗРЫВ!" : "")}";
+                aimText.text = $"верт. {v} · гор. {h}{(match ? " · ВЗРЫВ!" : "")}";
                 aimText.color = match ? Palette.Numbers[2] : Palette.InkDim;
             }
             board.UpdateAim(_aim, landing, match);
