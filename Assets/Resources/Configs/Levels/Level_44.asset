@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6daff4acf387714ca0adeafee382791, type: 3}
+  m_Name: Level_44
+  m_EditorClassIdentifier: Assembly-CSharp::NeonSeven.Configs.LevelConfig
+  _levelNumber: 44
+  _objective: 3
+  _moveLimit: 13
+  _targetScore: 86200
+  _targetObsidianBreaks: 23
+  _targetCombo: 6
+  _riseEveryMoves: 4
+  _initialRows: 3
+  _seed: 8628
+  _initialMatrix: ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff01000000ffffffff06000000ffffffffffffffffffffffffffffffffffffffff05000000ffffffff0200000007000000ffffffff02000000ffffffff0300000005000000ffffffffffffffff020000000000000003000000000000000200000001000000070000000100000005000000ffffffffffffffff01000000ffffffff

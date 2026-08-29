@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 542f550c3fcaa4f4f86e573db49c09da, type: 3}
+  m_Name: NeonSevenGameConfig
+  m_EditorClassIdentifier: Assembly-CSharp::NeonSeven.Configs.NeonSevenGameConfig
+  _boardSize: 7
+  _classicRiseEveryMoves: 5
+  _hiddenPieceChance: 0.15
+  _boardClearBonus: 70000
+  _backgroundTop: {r: 0.13, g: 0.06, b: 0.24, a: 1}
+  _backgroundBottom: {r: 0.03, g: 0.02, b: 0.08, a: 1}
+  _glass: {r: 0.24, g: 0.2, b: 0.36, a: 0.62}
+  _obsidian: {r: 0.035, g: 0.032, b: 0.055, a: 1}
+  _lava: {r: 1, g: 0.62, b: 0.1, a: 1}
+  _numberColors:
+  - {r: 0.96, g: 0.98, b: 1, a: 1}
+  - {r: 0.12, g: 0.84, b: 1, a: 1}
+  - {r: 0.11, g: 0.95, b: 0.55, a: 1}
+  - {r: 1, g: 0.86, b: 0.22, a: 1}
+  - {r: 1, g: 0.43, b: 0.18, a: 1}
+  - {r: 1, g: 0.18, b: 0.62, a: 1}
+  - {r: 0.55, g: 0.23, b: 1, a: 1}
